@@ -2,12 +2,22 @@
 #
 # Author: https://github.com/pstadler
 
-if [ $commands[kubectl] ]; then
-  source <(kubectl completion zsh)
-fi
-
 # This command is used ALOT both below and in daily life
-alias k=kubectl
+
+# Lazy load kubectl complete alias k=kubectl
+#
+function _k() {
+  if [ $commands[kubectl] ]; then
+    source <($commands[kubectl] completion zsh)
+  fi
+  unset -f _k
+  unalias kubectl
+  alias k=kubectl
+  $commands[kubectl] $*
+}
+
+alias k=_k
+alias kubectl=_k
 
 # Drop into an interactive terminal on a container
 alias keti='k exec -ti'
