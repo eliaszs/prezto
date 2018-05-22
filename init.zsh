@@ -123,11 +123,19 @@ function pmodload {
         done
       }
 
+      # Measure each module loading time with below command
+      #
+      # PREZTO_DEBUG=true /usr/bin/time zsh  -i -c exit | sort -gr
+      #
+      [[ -z ${PREZTO_DEBUG} ]] || local start_time=$(gdate +%s%N)
       if [[ -s "${pmodule_location}/init.zsh" ]]; then
         source "${pmodule_location}/init.zsh"
       elif [[ -s "${pmodule_location}/${pmodule}.plugin.zsh" ]]; then
         source "${pmodule_location}/${pmodule}.plugin.zsh"
       fi
+      [[ -z ${PREZTO_DEBUG} ]] || local end_time=$(gdate +%s%N)
+      [[ -z ${PREZTO_DEBUG} ]] || local took=$(expr ${end_time} - ${start_time})
+      [[ -z ${PREZTO_DEBUG} ]] || printf "$0: took %6.2f ms - $pmodule\n" $((took/1000000.0))
 
       if (( $? == 0 )); then
         zstyle ":prezto:module:$pmodule" loaded 'yes'
